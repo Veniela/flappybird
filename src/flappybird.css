@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #70c5ce;
+}
+
+.game-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper {
+  display: flex;
+}
+
+.box {
+  position: relative;
+  padding: 0.5em;
+  border: 2px solid #333;
+  border-radius: 8px;
+  margin: 20px;
+
+  background-image: url("flappybirdbg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+canvas {
+  display: block;
+  background: transparent;
+}
