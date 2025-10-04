@@ -12,7 +12,7 @@ body {
 #board {
   border: 2px solid #333;
   border-radius: 8px;
-  background-image: url("/src/flappybirdbg.png");
+  background-image: url("/flappybirdbg.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

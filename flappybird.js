@@ -31,20 +31,20 @@ window.onload = function() {
 
     //load images
     birdImg = new Image();
-    birdImg.src = "/src/flappybird.png";
+    birdImg.src = "/flappybird.png";
     birdImg.onload = function() {
         context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
     };
     // top p
     topPipeImg = new Image();
-    topPipeImg.src = "/src/toppipe.png";
+    topPipeImg.src = "/toppipe.png";
     topPipeImg.onload = function() {
         context.drawImage(topPipeImg, pipeX, pipeY, pipeWidth, pipeHeight);
     };
 
     // bottom p
     bottomPipeImg = new Image();
-    bottomPipeImg.src = "/src/bottompipe.png";
+    bottomPipeImg.src = "/bottompipe.png";
     bottomPipeImg.onload = function() {
         let gap = 150; // distance bt pipes
         let bottomPipeY = pipeHeight + gap;
