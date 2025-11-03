@@ -5,49 +5,127 @@ let boardHeight = 640;
 let context;
 
 //bird
-let birdWidth = 34; // width/height ratio = 17/12
+let birdWidth = 34;
 let birdHeight = 24;
 let birdX = boardWidth / 8;
 let birdY = boardHeight / 2;
 let birdImg;
 
-//pipes
-let pipeWidth = 64; // width/height ratio = 1/8
-let pipeHeight = 320;
-let pipeX = boardWidth - pipeWidth;
+
+let pipeWidth = 64;
+let pipeHeight = 512;
+let pipeX = boardWidth;
 let pipeY = 0;
 
-let topPipeImg;
-let bottomPipeImg;
+// let topPipeImg; // temporarily disabled
 
-window.onload = function() {
-    board = document.getElementById("board");
-    board.height = boardHeight;
-    board.width = boardWidth;
-    context = board.getContext("2d"); //used for drawing on the board
+// let velocityX = -2; // pipes moving left speed (disabled for now)
 
-    // context.fillStyle = "red";
-    // context.fillRect(100, 300, 50, 50); // example
+let velocityY = 0; // bird jump speed
+let gravity = 0.4;
+let jumpStrength = -6;
 
-    //load images
-    birdImg = new Image();
-    birdImg.src = "flappybird.png";
-    birdImg.onload = function() {
-        context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
-    };
-    // top p
-    topPipeImg = new Image();
-    topPipeImg.src = "toppipe.png";
-    topPipeImg.onload = function() {
-        context.drawImage(topPipeImg, pipeX, pipeY, pipeWidth, pipeHeight);
-    };
+let gameState = "RUNNING"; // or "GAME_OVER"
 
-    // bottom p
-    bottomPipeImg = new Image();
-    bottomPipeImg.src = "bottompipe.png";
-    bottomPipeImg.onload = function() {
-        let gap = 150; // distance bt pipes
-        let bottomPipeY = pipeHeight + gap;
-        context.drawImage(bottomPipeImg, pipeX, bottomPipeY, pipeWidth, pipeHeight);
-    };
+window.onload = function () {
+  board = document.getElementById("board");
+  board.height = boardHeight;
+  board.width = boardWidth;
+  context = board.getContext("2d"); 
+
+  //load bird image
+  birdImg = new Image();
+  birdImg.src = "./flappybird.png";
+  birdImg.onload = function () {
+    context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
+  };
+
+  //load pipe image (temporarily commented)
+  /*
+  topPipeImg = new Image();
+  topPipeImg.src = "./toppipe.png";
+  topPipeImg.onload = function () {
+    context.drawImage(topPipeImg, pipeX - pipeWidth, pipeY, pipeWidth, pipeHeight);
+  };
+  */
+
+  requestAnimationFrame(update);
+  document.addEventListener("keydown", handleInput);
+  document.addEventListener("click", handleInput);
+  document.addEventListener("contextmenu", restartGame); 
 };
+
+function update() {
+  requestAnimationFrame(update);
+  context.clearRect(0, 0, board.width, board.height);
+
+  if (gameState === "RUNNING") {
+    // Bird physics
+    velocityY += gravity;
+    birdY += velocityY;
+
+    // Keep bird within the screen
+    if (birdY < 0) {
+      birdY = 0;
+      velocityY = 0;
+    }
+
+    // Floor collision
+    if (birdY + birdHeight > boardHeight) {
+      birdY = boardHeight - birdHeight;
+      gameState = "GAME_OVER";
+    }
+
+    // pipeX += velocityX; // temporarily disabled
+  }
+
+  drawBird();
+
+  drawGameState();
+}
+
+function drawBird() {
+  context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
+}
+
+/*
+// Function to draw pipes (temporarily hidden)
+function drawPipe() {
+  context.drawImage(topPipeImg, pipeX, pipeY, pipeWidth, pipeHeight);
+}
+*/
+
+function handleInput(e) {
+  if (gameState !== "RUNNING") return;
+
+  if (e.code === "Space" || e.code === "ArrowUp" || e.type === "click") {
+    velocityY = jumpStrength; // jump
+  }
+}
+
+function drawGameState() {
+  if (gameState === "GAME_OVER") {
+    context.fillStyle = "red";
+    context.font = "bold 32px Arial";
+    context.fillText("GAME OVER", 80, boardHeight / 2);
+    context.font = "16px Arial";
+    context.fillText("Press R or Right-click to restart", 60, boardHeight / 2 + 40);
+  }
+}
+
+function restartGame(e) {
+  e.preventDefault(); 
+  if (gameState === "GAME_OVER") {
+    birdY = boardHeight / 2;
+    velocityY = 0;
+    gameState = "RUNNING";
+  }
+}
+
+document.addEventListener("keydown", function (e) {
+  if (e.code === "KeyR" && gameState === "GAME_OVER") {
+    birdY = boardHeight / 2;
+    velocityY = 0;
+    gameState = "RUNNING";
+  }
+});
