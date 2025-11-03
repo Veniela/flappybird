@@ -17,15 +17,15 @@ let pipeHeight = 512;
 let pipeX = boardWidth;
 let pipeY = 0;
 
-// let topPipeImg; // temporarily disabled
+// let topPipeImg; 
 
-// let velocityX = -2; // pipes moving left speed (disabled for now)
+// let velocityX = -2; 
 
-let velocityY = 0; // bird jump speed
+let velocityY = 0; 
 let gravity = 0.4;
 let jumpStrength = -6;
 
-let gameState = "RUNNING"; // or "GAME_OVER"
+let gameState = "RUNNING"; 
 
 window.onload = function () {
   board = document.getElementById("board");
@@ -40,14 +40,13 @@ window.onload = function () {
     context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
   };
 
-  //load pipe image (temporarily commented)
-  /*
-  topPipeImg = new Image();
-  topPipeImg.src = "./toppipe.png";
-  topPipeImg.onload = function () {
-    context.drawImage(topPipeImg, pipeX - pipeWidth, pipeY, pipeWidth, pipeHeight);
-  };
-  */
+  //pipe image 
+//   topPipeImg = new Image();
+//   topPipeImg.src = "./toppipe.png";
+//   topPipeImg.onload = function () {
+//     context.drawImage(topPipeImg, pipeX - pipeWidth, pipeY, pipeWidth, pipeHeight);
+//   };
+  
 
   requestAnimationFrame(update);
   document.addEventListener("keydown", handleInput);
@@ -60,23 +59,23 @@ function update() {
   context.clearRect(0, 0, board.width, board.height);
 
   if (gameState === "RUNNING") {
-    // Bird physics
+    
     velocityY += gravity;
     birdY += velocityY;
 
-    // Keep bird within the screen
+    
     if (birdY < 0) {
       birdY = 0;
       velocityY = 0;
     }
 
-    // Floor collision
+    
     if (birdY + birdHeight > boardHeight) {
       birdY = boardHeight - birdHeight;
       gameState = "GAME_OVER";
     }
 
-    // pipeX += velocityX; // temporarily disabled
+    // pipeX += velocityX; 
   }
 
   drawBird();
@@ -88,12 +87,11 @@ function drawBird() {
   context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
 }
 
-/*
-// Function to draw pipes (temporarily hidden)
-function drawPipe() {
-  context.drawImage(topPipeImg, pipeX, pipeY, pipeWidth, pipeHeight);
-}
-*/
+
+// function drawPipe() {
+//   context.drawImage(topPipeImg, pipeX, pipeY, pipeWidth, pipeHeight);
+// }
+
 
 function handleInput(e) {
   if (gameState !== "RUNNING") return;
