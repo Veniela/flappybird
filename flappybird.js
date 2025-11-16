@@ -10,8 +10,8 @@ let birdY = boardHeight / 2;
 let birdImg;
 
 let velocityY = 0;
-let gravity = 0.2;
-let jumpStrength = -6;
+let gravity = 0.099;   
+let jumpStrength = -3; 
 
 let gameState = "RUNNING";
 
@@ -41,6 +41,8 @@ window.onload = function () {
     context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
   };
 
+  spawnPipe();
+
   requestAnimationFrame(update);
   document.addEventListener("keydown", handleInput);
   document.addEventListener("click", handleInput);
@@ -48,7 +50,7 @@ window.onload = function () {
 };
 
 function spawnPipe() {
-  let gap = 140;
+  let gap = 150;
   let topHeight = Math.random() * (boardHeight - gap - 100) + 50;
 
   pipes.push({
@@ -79,6 +81,15 @@ function update() {
 
     for (let i = 0; i < pipes.length; i++) {
       pipes[i].x -= 1;
+
+      if (
+        isColliding(
+          { x: birdX, y: birdY, width: birdWidth, height: birdHeight },
+          pipes[i]
+        )
+      ) {
+        gameState = "GAME_OVER";
+      }
 
       if (pipes[i].x + pipeWidth < 0) {
         pipes.splice(i, 1);
@@ -120,6 +131,40 @@ function drawPipes() {
   }
 }
 
+function isColliding(bird, pipe) {
+  let topPipe = {
+    x: pipe.x,
+    y: pipe.topHeight - pipeHeight,
+    width: pipeWidth,
+    height: pipeHeight,
+  };
+
+  let bottomPipe = {
+    x: pipe.x,
+    y: pipe.topHeight + pipe.gap,
+    width: pipeWidth,
+    height: pipeHeight,
+  };
+
+  if (
+    bird.x < topPipe.x + topPipe.width &&
+    bird.x + bird.width > topPipe.x &&
+    bird.y < topPipe.y + topPipe.height
+  ) {
+    return true;
+  }
+
+  if (
+    bird.x < bottomPipe.x + bottomPipe.width &&
+    bird.x + bird.width > bottomPipe.x &&
+    bird.y + bird.height > bottomPipe.y
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
 function handleInput(e) {
   if (gameState !== "RUNNING") return;
 
@@ -130,11 +175,27 @@ function handleInput(e) {
 
 function drawGameState() {
   if (gameState === "GAME_OVER") {
-    context.fillStyle = "red";
-    context.font = "bold 32px Arial";
-    context.fillText("GAME OVER", 80, boardHeight / 2);
-    context.font = "16px Arial";
-    context.fillText("Right-click to restart", 60, boardHeight / 2 + 40);
+    context.fillStyle = "black";
+    context.font = "bold 46px Arial";
+
+    let text1 = "GAME OVER";
+    let text1Width = context.measureText(text1).width;
+
+    context.fillText(
+      text1,
+      (boardWidth - text1Width) / 2,
+      boardHeight / 2 - 20
+    );
+
+    context.font = "20px Arial";
+    let text2 = "Right-click to restart";
+    let text2Width = context.measureText(text2).width;
+
+    context.fillText(
+      text2,
+      (boardWidth - text2Width) / 2,
+      boardHeight / 2 + 20
+    );
   }
 }
 
@@ -145,6 +206,7 @@ function restartGame(e) {
     birdY = boardHeight / 2;
     velocityY = 0;
     pipes = [];
+    spawnPipe();
     gameState = "RUNNING";
   }
 }
@@ -154,6 +216,7 @@ document.addEventListener("keydown", function (e) {
     birdY = boardHeight / 2;
     velocityY = 0;
     pipes = [];
+    spawnPipe();
     gameState = "RUNNING";
   }
 });
