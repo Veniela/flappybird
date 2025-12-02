@@ -22,6 +22,13 @@ let pipes = [];
 let pipeTopImg;
 let pipeBottomImg;
 
+// --- Score variables ---
+let score = 0;
+let scoredPipes = new Set();
+
+// --- Saved high score ---
+let highScore = Number(localStorage.getItem("flappy_highscore")) || 0;
+
 window.onload = function () {
   board = document.getElementById("board");
   board.height = boardHeight;
@@ -77,18 +84,23 @@ function update() {
     if (birdY + birdHeight > boardHeight) {
       birdY = boardHeight - birdHeight;
       gameState = "GAME_OVER";
+      saveHighScore();
     }
 
     for (let i = 0; i < pipes.length; i++) {
       pipes[i].x -= 1;
 
-      if (
-        isColliding(
-          { x: birdX, y: birdY, width: birdWidth, height: birdHeight },
-          pipes[i]
-        )
-      ) {
+      if (isColliding(
+        { x: birdX, y: birdY, width: birdWidth, height: birdHeight },
+        pipes[i]
+      )) {
         gameState = "GAME_OVER";
+        saveHighScore();
+      }
+
+      if (!scoredPipes.has(pipes[i]) && pipes[i].x + pipeWidth < birdX) {
+        score++;
+        scoredPipes.add(pipes[i]);
       }
 
       if (pipes[i].x + pipeWidth < 0) {
@@ -102,13 +114,23 @@ function update() {
     }
   }
 
-  drawBird();
   drawPipes();
+  drawBird();  
+  drawScore();
   drawGameState();
 }
 
 function drawBird() {
-  context.drawImage(birdImg, birdX, birdY, birdWidth, birdHeight);
+  // falling speed
+  let angle = velocityY * 6; 
+  if (angle > 90) angle = 90;
+  if (angle < -25) angle = -25;
+
+  context.save();
+  context.translate(birdX + birdWidth / 2, birdY + birdHeight / 2);
+  context.rotate((angle * Math.PI) / 180);
+  context.drawImage(birdImg, -birdWidth / 2, -birdHeight / 2, birdWidth, birdHeight);
+  context.restore();
 }
 
 function drawPipes() {
@@ -129,6 +151,15 @@ function drawPipes() {
       pipeHeight
     );
   }
+}
+
+function drawScore() {
+  context.fillStyle = "black";
+  context.font = "30px Arial";
+  context.fillText("Score: " + score, 10, 40);
+
+  context.font = "20px Arial";
+  context.fillText("Best: " + highScore, 10, 70);
 }
 
 function isColliding(bird, pipe) {
@@ -199,6 +230,13 @@ function drawGameState() {
   }
 }
 
+function saveHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("flappy_highscore", highScore);
+  }
+}
+
 function restartGame(e) {
   e.preventDefault();
 
@@ -208,6 +246,9 @@ function restartGame(e) {
     pipes = [];
     spawnPipe();
     gameState = "RUNNING";
+
+    score = 0;
+    scoredPipes.clear();
   }
 }
 
@@ -218,5 +259,8 @@ document.addEventListener("keydown", function (e) {
     pipes = [];
     spawnPipe();
     gameState = "RUNNING";
+
+    score = 0;
+    scoredPipes.clear();
   }
 });
